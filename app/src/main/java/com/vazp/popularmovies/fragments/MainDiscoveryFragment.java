@@ -6,24 +6,26 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vazp.popularmovies.NetworkUtility;
 import com.vazp.popularmovies.adapters.MoviesAdapter;
 import com.vazp.popularmovies.data.MoviesContract;
-import com.vazp.popularmovies.tasks.GetMoviesTask;
 import com.vazp.popularmovies.R;
+import com.vazp.popularmovies.tasks.GetMoviesTask;
 
 /**
  * Created by Miguel on 15/07/2015.
@@ -36,6 +38,8 @@ public class MainDiscoveryFragment extends Fragment implements LoaderManager.Loa
 
     private MoviesAdapter mMoviesAdapter;
     private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private CoordinatorLayout mCoordinatorLayout;
     private int mPosition = RecyclerView.NO_POSITION;
 
     public interface Callback
@@ -47,10 +51,6 @@ public class MainDiscoveryFragment extends Fragment implements LoaderManager.Loa
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        GetMoviesTask getMoviesTask = new GetMoviesTask(getActivity());
-        getMoviesTask.execute(preferences.getString(getResources().getString(R.string.settings_sort_key), getResources().getString(R.string.settings_sort_popularity)));
     }
 
     @Override
@@ -58,7 +58,21 @@ public class MainDiscoveryFragment extends Fragment implements LoaderManager.Loa
     {
         View rootView = inflater.inflate(R.layout.fragment_main_discovery, container, false);
 
+        mCoordinatorLayout =
+                (CoordinatorLayout) rootView.findViewById(R.id.main_discovery_coordinatorlayout);
+        mSwipeRefreshLayout =
+                (SwipeRefreshLayout) rootView.findViewById(R.id.main_discovery_swiperefresh);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.main_discovery_recyclerview);
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        {
+            @Override
+            public void onRefresh()
+            {
+                fetchMovies();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager;
@@ -103,8 +117,19 @@ public class MainDiscoveryFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
+        if (savedInstanceState == null)
+        {
+            fetchMovies();
+        }
+
         getLoaderManager().initLoader(MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -131,6 +156,35 @@ public class MainDiscoveryFragment extends Fragment implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader)
     {
         mMoviesAdapter.swapCursor(null);
+    }
+
+    public void fetchMovies()
+    {
+        if (NetworkUtility.checkConnection(getActivity()))
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            GetMoviesTask getMoviesTask = new GetMoviesTask(getActivity());
+            getMoviesTask.execute(
+                    preferences.getString(
+                            getString(R.string.settings_sort_key),
+                            getString(R.string.settings_sort_popularity)));
+        }
+        else
+        {
+            Snackbar.make(mCoordinatorLayout,
+                          getString(R.string.no_connection),
+                          Snackbar.LENGTH_LONG)
+                    .setAction(
+                            getString(R.string.retry),
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View v)
+                                {
+                                    fetchMovies();
+                                }
+                            }).show();
+        }
     }
 
 }

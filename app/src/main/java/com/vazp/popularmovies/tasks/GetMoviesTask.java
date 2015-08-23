@@ -59,7 +59,7 @@ public class GetMoviesTask extends AsyncTask<String, Void, Void>
 					.build();
 
 			URL url = new URL(buildUri.toString());
-//			Log.v(LOG_TAG, "Builr URI " + url.toString());
+			Log.v(LOG_TAG, "Builr URI " + url.toString());
 
 			urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setRequestMethod("GET");

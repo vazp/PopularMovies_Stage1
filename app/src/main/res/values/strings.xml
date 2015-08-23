@@ -1,6 +1,6 @@
 <resources>
     <string name="api_key" translatable="false">api_key</string>
-    <string name="base_movie_image_url" translatable="false"> http://image.tmdb.org/t/p/</string>
+    <string name="base_movie_image_url" translatable="false">http://image.tmdb.org/t/p/</string>
     <string name="image_size" translatable="false">w342</string>
 
     <string name="app_name">Popular Movies</string>
@@ -9,6 +9,8 @@
     <string name="in_theaters">In theaters:</string>
     <string name="average_rating">Average rating:</string>
     <string name="overview">Overview:</string>
+    <string name="no_connection">No connection</string>
+    <string name="retry">Retry</string>
 
     <string name="id_movie_key" translatable="false">id_movie</string>
     <string name="release_date_key" translatable="false">release_date</string>

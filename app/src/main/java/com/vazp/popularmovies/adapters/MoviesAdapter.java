@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.vazp.popularmovies.NetworkUtility;
 import com.vazp.popularmovies.R;
 import com.vazp.popularmovies.data.MoviesContract.MovieEntry;
 
@@ -114,7 +115,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         holder.setTitle(mCursor.getString(mCursor.getColumnIndex(MovieEntry.COLUMN_TITLE)));
         holder.setPoster(mCursor.getString(mCursor.getColumnIndex(MovieEntry.COLUMN_POSTER)));
 
-        if (holder.getPoster().equals("null"))
+        if (holder.getPoster().equals("null") || !NetworkUtility.checkConnection(mContext))
         {
             holder.posterImageView.setImageResource(R.drawable.image_not_available);
         }

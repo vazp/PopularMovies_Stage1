@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 
+import com.vazp.popularmovies.NetworkUtility;
 import com.vazp.popularmovies.R;
 import com.vazp.popularmovies.tasks.GetMoviesTask;
 
@@ -63,7 +64,7 @@ public class SettingsActivity extends Activity
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
-            if (fetchMovies)
+            if (fetchMovies && NetworkUtility.checkConnection(getActivity()))
             {
                 GetMoviesTask getMoviesTask = new GetMoviesTask(getActivity());
                 getMoviesTask.execute(sharedPreferences.getString(key, ""));

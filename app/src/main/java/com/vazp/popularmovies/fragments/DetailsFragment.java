@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.vazp.popularmovies.NetworkUtility;
 import com.vazp.popularmovies.R;
 import com.vazp.popularmovies.data.MoviesContract;
 
@@ -130,7 +131,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             mRatingTextView.setText(String.format("%.1f / 10", rating));
             mOverviewTextView.setText(overview);
 
-            if (poster.equals("null"))
+            if (poster.equals("null") || !NetworkUtility.checkConnection(getActivity()))
             {
                 mPoster.setImageResource(R.drawable.image_not_available);
             }
